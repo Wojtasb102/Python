@@ -8,6 +8,13 @@ mydb = mysql.connector.connect(
 )
 
 
+def send_query(query):
+    mycursor = mydb.cursor()
+    mycursor.execute(query)
+    myresult = mycursor.fetchall()
+    print(myresult)
+
+
 def fetch_from_sql():
     mycursor = mydb.cursor()
     mycursor.execute("SELECT * FROM wykaz")
@@ -24,6 +31,6 @@ def fetch_from_sql():
             data.append(myresult[x][y])
         nested.append(data)
 
-    print(nested[1][2])
-    return data
+    print(myresult[1][2])
+    return myresult
 # hasło do bazy ZaQ1@wSx
