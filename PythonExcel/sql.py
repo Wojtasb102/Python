@@ -12,9 +12,18 @@ def fetch_from_sql():
     mycursor = mydb.cursor()
     mycursor.execute("SELECT * FROM wykaz")
     myresult = mycursor.fetchall()
+    nested = []
 
-    for x in myresult:
-        print(x)
+    print(len(myresult))
+    print(len(myresult[1]))
 
-    return myresult
+    for x in range(len(myresult)):
+        # x = str.strip("()")
+        data = []
+        for y in range(len(myresult[x])):
+            data.append(myresult[x][y])
+        nested.append(data)
+
+    print(nested[1][2])
+    return data
 # hasło do bazy ZaQ1@wSx
