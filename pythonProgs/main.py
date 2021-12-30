@@ -8,6 +8,8 @@ class FunkcjaKwadratowa:
         self.c = c
 
 
+
+
     def wyswietlDane(self):
         print("Paramter a: {}, paramter b: {}, paramter c: {}".format(self.a, self.b, self.c))
 
