@@ -15,6 +15,9 @@ def load_worksheet_to_db(worksheet):
     mycursor.execute("TRUNCATE TABLE {}".format(worksheet))
     lastRow = ws.UsedRange.Rows.Count
     # print(lastRow)
+    headings = ws.cos
+    for x in ws.cos:
+
 
     for i in range(2, lastRow + 1):
         name = ws.Cells(i, 2)
@@ -82,6 +85,10 @@ for dzial in ("P1", "P2"):
         wykaz.Cells(i, row).Value -= myresult[0]
         # print(myresult[0])
     row = row + 1
+
+    def cos (**kwargs):
+        f"select co..... Dzial={kwargs[dzial]}"
+    cos(dzial='NE',doDzial="P2')
 
 row = 2;
 for dzial in ("P1", "P2"):
