@@ -1,9 +1,12 @@
 import math
+
+
 class FunkcjaKwadratowa:
     def __init__(self, a, b, c):
         self.a = a
         self.b = b
         self.c = c
+
 
     def wyswietlDane(self):
         print("Paramter a: {}, paramter b: {}, paramter c: {}".format(self.a, self.b, self.c))
