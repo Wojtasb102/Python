@@ -1,5 +1,5 @@
 from win32com.client import Dispatch
-import sql
+import sqlLite
 import os
 
 DIR = os.getcwd()

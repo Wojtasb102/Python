@@ -1,0 +1,5 @@
+x = input("Daj liczby: ")
+lista = x.split(',')
+tuplet = tuple(lista)
+print(lista)
+print(tuplet)
