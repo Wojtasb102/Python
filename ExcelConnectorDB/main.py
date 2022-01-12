@@ -30,8 +30,11 @@ class Connector:
         #     return self.worksheet.cell(row=x, column=y).number_format
         return self.worksheet.cell(row=y, column=x).value
 
-    def change_worksheet(self, sheetname):
-        self.worksheet = self.workbook[sheetname]
+    def get_type(self, x, y):
+        return self.worksheet.cell(row=y, column=x).number_format
+
+    def change_worksheet(self, sheet_name):
+        self.worksheet = self.workbook[sheet_name]
 
     def create_db_connection(self):
         filename = os.path.join(self.dirname, self.dbName)
@@ -46,6 +49,12 @@ class Connector:
         for i in range(1, self.get_dimension()[1] + 1):
             header.append(self.get_cell(i, 1))
         return header
+
+    def get_header_type(self):
+        header_type = []
+        for i in range(1, self.get_dimension()[1] + 1):
+            header_type.append(self.get_type(i, 2))
+        return header_type
 
     def print_data(self):
         i = 1
@@ -70,6 +79,16 @@ def main():
     print(conector.get_dimension()[0])
     print(conector.get_header())
     conector.print_data()
+    print(conector.get_header())
+    print(conector.get_header_type())
+    typy = {"@": "Varchar", "0": "Integer", "0.00": "Integer", "General": "Ogólne"}
+    typsy = []
+    for x in conector.get_header_type():
+        if not (x in typy.keys()):
+            typsy.append("Varchar")
+        else:
+            typsy.append(typy[x])
+    print(",".join(typsy))
 
 
 main()
