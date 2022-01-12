@@ -27,7 +27,7 @@ class Connector:
         return self.workbook.sheetnames
 
     def get_cell(self, x, y):
-        #        return self.worksheet.cell(row=x, column=y).number_format
+        #     return self.worksheet.cell(row=x, column=y).number_format
         return self.worksheet.cell(row=y, column=x).value
 
     def change_worksheet(self, sheetname):
