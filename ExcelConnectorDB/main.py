@@ -56,7 +56,7 @@ class Connector:
             header.append(self.get_cell(i, 1))
         return header
 
-    def get_header_sql(self):
+    def get_header_sql_type(self):
         header = self.get_header_type()
         typy = {"@": "Varchar(30)", "0": "Integer", "0.00": "Integer", "General": "Ogólne"}
         typsy = []
@@ -73,10 +73,14 @@ class Connector:
             header_type.append(self.get_type(i, 2))
         return header_type
 
+    # Do ewentualnej poprawy: Dodawanie nawiasów w przypadku typu TEKSTOWEGO
     def get_row(self, row_number):
         row = []
         for column in range(1, self.get_max_x() + 1):
-            row.append(str(self.get_cell(column, row_number)))
+            if self.get_header_type()[column - 1] == "@":
+                row.append("'" + str(self.get_cell(column, row_number)) + "'")
+            else:
+                row.append(str(self.get_cell(column, row_number)))
         # print(row)
         return row
 
@@ -122,9 +126,9 @@ class Connector:
     def execute_query(self, query):
         conn = sqlite3.connect(self.db_dir)
         c = conn.cursor()
-        self.c.execute(query)
-        results = self.c.fetchall()
+        c.execute(query)
         conn.commit()
+        results = c.fetchall()
         conn.close()
         return results
 
@@ -141,7 +145,7 @@ class Connector:
     def create_table(self, sheet_name):
         fields = []
         for i, x in enumerate(self.get_header()):
-            fields.append("'{}'{}".format(x, self.get_header_sql()[i]))
+            fields.append("'{}'{}".format(x, self.get_header_sql_type()[i]))
         a = ','.join(fields)
         print(a)
         query = "CREATE TABLE '{}' (".format(sheet_name)
@@ -150,21 +154,30 @@ class Connector:
         self.execute_query(query)
         # "CREATE TABLE`NazwaTabeli`('Pole1' INTEGER,'Pole2'VARCHAR(20),'Pole3'INTEGER,'Field4'INTEGER);")
 
-    def insert_excel_data_into_sql(self):
-        pass
+    def insert_all_excel_data_into_sql(self):
+        for sheet in self.sheet_list():
+            self.change_worksheet(sheet)
+            self.create_table(sheet)
+            self.insert_sheet_into_sql(sheet)
+
+
     # INSERT
     # INTO
     # table(column1, column2,..)
     # VALUES(value1, value2, ...);
-    def insert_row_from_excel_to_sql(self, row):
+    def insert_row_from_excel_to_sql(self, row, sheet_name):
         head = []
         value = []
-        x= self.get_row(row)
-        head = ",".join(self.get_header())
+        x = self.get_row(row)
         value = ",".join(x)
+        query = "INSERT INTO '{}'VALUES({});".format(sheet_name, value)
+        print(query)
+        # print(value)
+        self.execute_query(query)
 
-        print(head)
-        print(value)
+    def insert_sheet_into_sql(self, sheet):
+        for i in range (2, self.get_max_y() + 1):
+            self.insert_row_from_excel_to_sql(i, sheet)
 
 
 def main():
@@ -174,11 +187,11 @@ def main():
     conector.is_file("Database.db")
     print("Start Main")
     print(conector.sheet_list())
-    conector.change_worksheet("Sheet")
+    conector.change_worksheet(conector.sheet_list()[0])
     print(conector.get_cell(1, 1))
-    conector.change_worksheet("Arkusz1")
+    conector.change_worksheet(conector.sheet_list()[1])
     print(conector.get_cell(1, 1))
-    conector.change_worksheet("Sheet")
+    conector.change_worksheet(conector.sheet_list()[0])
     print(conector.get_dimension()[0])
     print(conector.get_header())
     conector.print_data()
@@ -200,9 +213,11 @@ def main():
     print("DANE:")
     # for i in range(1, conector.get_max_y() + 1):
     #     conector.get_row(i)
-    #print(conector.get_row(2))
-    conector.insert_row_from_excel_to_sql(2)
-    # print(conector.get_header_sql())
+    # print(conector.get_row(2))
+    #conector.create_table("Sheet")
+    print(conector.insert_all_excel_data_into_sql())
+
+    # print(conector.get_header_sql_type())
 
 
 main()
