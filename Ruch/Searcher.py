@@ -13,6 +13,7 @@ class Searcher:
         self.worksheet = self.workbook.active
         self.dzialy = {"N-2": 2, "G-2": 3, "NE-1": 4, "NE-2": 5, "N-3": 6, "H-2": 7, "NK": 8, "Umysłowi": 9,
                        "NE (NE-2)": 5, "NE (NE-1)": 4}
+        print("Aktywowano szperacza")
 
     def create_db_connection(self):
         file_name = os.path.join(self.dir_name, self.db_name)
@@ -36,7 +37,7 @@ class Searcher:
     def set_cell(self, x, y, value):
         #     return self.worksheet.cell(row=x, column=y).number_format
         self.worksheet.cell(row=y, column=x).value = value
-        #self.workbook.save(self.excel_name)
+        # self.workbook.save(self.excel_name)
 
     def get_dimension(self):
         dimension = (self.worksheet.max_column, self.worksheet.max_row)
@@ -44,6 +45,7 @@ class Searcher:
 
     def change_worksheet(self, sheet_name):
         self.worksheet = self.workbook[sheet_name]
+        print("Przełączono arkusz na: {}".format(sheet_name))
 
     def get_date_index(self, date):
         # print ("SELECT Lp FROM Daty WHERE Data = {}".format(date))
@@ -57,27 +59,29 @@ class Searcher:
     def calculate_changes(self, sheetname, operation):
         for x in range(1, self.execute_query("SELECT COUNT (Lp) FROM {} ".format(sheetname))[0][0] + 1):
             query_response = self.get_db_row(x, sheetname, "Dział, Data")
-            print(query_response[0])
-            print(query_response[1])
+            # print(query_response[0])
+            # print(query_response[1])
             self.change_worksheet("inne")
             column = self.dzialy[query_response[0]]
             row = int(self.get_date_index(query_response[1]))
-            print("kolumna: {}".format(column))
-
-            self.write(column, row, operation)
+            # print("kolumna: {}".format(column))
+            if operation == -1:
+                self.write(column, row + 1, operation)  # jeżeli zwolnienia to wykonać operację na następnym dniu
+            else:
+                self.write(column, row, operation)  # jeżeli nie zwolnienia to wykonać operację normalnie
 
     def calculate_transfer(self, sheetname):
-        print(self.execute_query("SELECT COUNT (Lp) FROM {} ".format(sheetname))[0][0] + 1)
+        # print(self.execute_query("SELECT COUNT (Lp) FROM {} ".format(sheetname))[0][0] + 1)
         for x in range(1, self.execute_query("SELECT COUNT (Lp) FROM {} ".format(sheetname))[0][0] + 1):
             query_response = self.get_db_row(x, sheetname, "Dział, Data,[Dział poprzedni]")
-            print(query_response[0])
-            print(query_response[1])
-            print(query_response[2])
+            # print(query_response[0])
+            # print(query_response[1])
+            # print(query_response[2])
             self.change_worksheet("inne")
             row = self.get_date_index(query_response[1])
             column_to = self.dzialy[query_response[0]]
             column_from = self.dzialy[query_response[2]]
-            print("kolumna: {}".format(column_to))
+            # print("kolumna: {}".format(column_to))
 
             self.write(column_to, row, 1)
             self.write(column_from, row, -1)
@@ -93,10 +97,12 @@ class Searcher:
 
     def clear(self):
         self.change_worksheet("inne")
-        print(self.get_dimension())
-        max_x = self.get_dimension()[0]+1
-        max_y = self.get_dimension()[1]+1
-        for x in range (2, max_x):
-            for y in range (2, max_y):
-                #self.set_cell(x, y, None)
+        print("Wymiary excela: {}".format(self.get_dimension()))
+        max_x = self.get_dimension()[0] + 1
+        max_y = self.get_dimension()[1] + 1
+        for x in range(2, max_x):
+            for y in range(2, max_y):
+                # self.set_cell(x, y, None)
                 self.worksheet.cell(row=y, column=x).value = None
+
+        print("Wyczszczono arkusz 'Inne' w celu uniknięcia powtórzeń")

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Figury</title>
+</head>
+<body>
+    <h1>Oto wszystkie figury</h1>
+    {% if figury|length != 0 %}
+        {% for figura in figury %}
+            {{figura}}<br>
+        {% endfor %}
+    {%endif%}
+</body>
+</html>

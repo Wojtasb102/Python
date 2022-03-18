@@ -1,3 +1,5 @@
+from os.path import abspath
+
 from openpyxl import *
 import os
 import sqlite3
@@ -8,6 +10,7 @@ class Connector:
         self.excelName = excelName
         self.dbName = dbName
         self.dirname = os.path.dirname(__file__)
+
         if not self.is_file(self.excelName):
             workbook = Workbook()
             workbook.save(filename=excelName)
@@ -15,8 +18,10 @@ class Connector:
         self.worksheet = self.workbook.active
 
         self.db_dir = os.path.join(self.dirname, self.dbName)
+        #print(self.db_dir)
+        #print((abspath(__file__)))
         self.create_db_connection()
-
+        print("Otwarto baze danych: {}".format(self.dbName))
         # if not self.is_file(self.dbName):
         #     filename = os.path.join(self.dirname, self.dbName)
         #     conn = sqlite3.connect(filename)
@@ -24,7 +29,12 @@ class Connector:
     def is_file(self, fileName):
         # dirname = os.path.dirname(__file__)
         filename = os.path.join(self.dirname, fileName)
-        print(os.path.isfile(filename))
+
+        print("Szukanie pliku pod ścieżką: {}".format(filename))
+        if os.path.isfile(filename):
+            print("Plik istnieje")
+        else:
+            print("Plik nieistnieje")
         return os.path.isfile(filename)
 
     def sheet_list(self):
@@ -39,6 +49,7 @@ class Connector:
 
     def change_worksheet(self, sheet_name):
         self.worksheet = self.workbook[sheet_name]
+        print("Przełączono arkusz na: {}".format(sheet_name))
 
     def get_dimension(self):
         dimension = (self.worksheet.max_column, self.worksheet.max_row)
@@ -81,7 +92,7 @@ class Connector:
                 row.append("'" + str(self.get_cell(column, row_number)) + "'")
             elif self.get_header_type()[column - 1] in ["mm-dd-yy"]:
                 date = self.get_cell(column, row_number)
-                row.append("'{}-{}-{}'".format(date.strftime("%Y"),date.strftime("%m"),date.strftime("%d")))
+                row.append("'{}-{}-{}'".format(date.strftime("%Y"), date.strftime("%m"), date.strftime("%d")))
             else:
                 row.append(str(self.get_cell(column, row_number)))
         # print(row)
@@ -90,7 +101,7 @@ class Connector:
     # ----------------------------- DB METODH
 
     def create_db_connection(self):
-        filename = os.path.join(self.dirname, self.dbName)
+        filename = self.dbName
         self.conn = sqlite3.connect(filename)
         self.c = self.conn.cursor()
 
@@ -111,18 +122,22 @@ class Connector:
     # self.conn.close()
 
     def delete_all_tables(self):
+        str = []
         for tablenames in self.read_table_names():
-            print("DROP table '{}';".format(tablenames))
+            str.append(tablenames)
+            #print("DROP table '{}';".format(tablenames))
             querry = "DROP table '{}';".format(tablenames)
             # self.c.execute(querry)
             self.execute_query(querry)
+        print("Skasowano tabele: {}".format(str))
 
     def delete_selected_tables(self, selected_tables):
         for tablenames in selected_tables:
-            print("DROP table '{}';".format(tablenames))
+            #print("DROP table '{}';".format(tablenames))
             querry = "DROP table '{}';".format(tablenames)
             # self.c.execute(querry)
             self.execute_query(querry)
+        print("Skasowano tabele: {}".format(selected_tables))
 
     def read_table_names(self):
         # self.c.execute("SELECT name FROM sqlite_master WHERE type='table'")
@@ -157,10 +172,10 @@ class Connector:
         for i, x in enumerate(self.get_header()):
             fields.append("'{}'{}".format(x, self.get_header_sql_type()[i]))
         a = ','.join(fields)
-        print(a)
+        #print(a)
         query = "CREATE TABLE '{}' (".format(sheet_name)
         query += (a + ");")
-        print(query)
+        #print(query)
         self.execute_query(query)
         # "CREATE TABLE`NazwaTabeli`('Pole1' INTEGER,'Pole2'VARCHAR(20),'Pole3'INTEGER,'Field4'INTEGER);")
 
@@ -175,7 +190,7 @@ class Connector:
             self.change_worksheet(sheet)
             self.create_table(sheet)
             self.insert_sheet_into_sql(sheet)
-
+            print("Przeniesione dane z {} do sql".format(sheet))
 
     # INSERT
     # INTO
@@ -187,12 +202,12 @@ class Connector:
         x = self.get_row(row)
         value = ",".join(x)
         query = "INSERT INTO '{}'VALUES({});".format(sheet_name, value)
-        print(query)
+        #print(query)
         # print(value)
         self.execute_query(query)
 
     def insert_sheet_into_sql(self, sheet):
-        for i in range (2, self.get_max_y() + 1):
+        for i in range(2, self.get_max_y() + 1):
             self.insert_row_from_excel_to_sql(i, sheet)
 
 
@@ -230,10 +245,7 @@ def main():
     # for i in range(1, conector.get_max_y() + 1):
     #     conector.get_row(i)
     # print(conector.get_row(2))
-    #conector.create_table("Sheet")
+    # conector.create_table("Sheet")
     print(conector.insert_all_excel_data_into_sql())
 
     # print(conector.get_header_sql_type())
-
-
-
