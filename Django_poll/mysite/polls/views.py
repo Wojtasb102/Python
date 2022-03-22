@@ -9,6 +9,7 @@ from django.views import generic
 from .models import Question, Choice
 from django.utils import timezone
 
+
 # Create your views here.
 
 class IndexView(generic.ListView):
@@ -19,7 +20,7 @@ class IndexView(generic.ListView):
         # zwróć 5 ostatnich pytań
         return Question.objects.filter(
             pub_date__lte=timezone.now()
-            ).order_by('-pub_date')[:5]
+        ).order_by('-pub_date')[:5]
 
 
 class DetailView(generic.DetailView):
@@ -53,7 +54,23 @@ def create(request, question_id):
     context = {
         "question": question,
     }
-    return render(request, 'polls/create.html', context)
+    print(request.POST.get('dodaj'))
+    print(request.POST.get('usun'))
+    print(request.POST.get('new_choice'))
+    if request.method == "POST":
+        if 'dodaj' in request.POST:
+            print("dodaj")
+            question.choice_set.create(choice_text=request.POST.get('new_choice'), votes=0)
+            return render(request, 'polls/detail.html', context)
+
+        if 'usun' in request:
+            print("usun")
+
+
+
+    else:
+        print("Nie było POST")
+        return render(request, 'polls/create.html', context)
 
 
 def add(request, question_id):

@@ -16,7 +16,10 @@
             {% endfor %}
         </fieldset>
         <button type="sumbit" value="Vote">Głosuj!</button>
-    </form>
 
+    </form>
+    <form>
+    <button formaction="{% url 'polls:create' question.id %}">Nowa Opcja</button>
+        </form>
 </body>
 </html>
