@@ -12,7 +12,7 @@
 
         {% for choice in question.choice_set.all %}
         <li>
-            <input type=radio name="asd" id="choice" value="{{choice.id}}">
+            <input type=checkbox name="asd" id="choice" value="{{choice.id}}">
             <label>{{ forloop.counter }} {{ choice.choice_text }} </label>
 
 

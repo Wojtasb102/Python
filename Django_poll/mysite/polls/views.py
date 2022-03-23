@@ -46,7 +46,7 @@ def vote(request, question_id):
         selected_choice.votes += 1
         selected_choice.save()
 
-        return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
+        return HttpResponseRedirect(reverse('polls:detail', args=(question.id+1,)))
 
 
 def create(request, question_id):
@@ -54,18 +54,22 @@ def create(request, question_id):
     context = {
         "question": question,
     }
-    print(request.POST.get('dodaj'))
-    print(request.POST.get('usun'))
-    print(request.POST.get('new_choice'))
+    print(request.POST)
+    choice_id = request.POST.get('asd')
     if request.method == "POST":
         if 'dodaj' in request.POST:
             print("dodaj")
             question.choice_set.create(choice_text=request.POST.get('new_choice'), votes=0)
-            return render(request, 'polls/detail.html', context)
 
-        if 'usun' in request:
-            print("usun")
 
+        elif 'usun' in request.POST and 'asd' in request.POST:
+            choice_id = request.POST.getlist('asd')
+            for ids in choice_id:
+                question.choice_set.get(id=ids).delete()
+            print(choice_id)
+            #print(question.choice_set.get(id= choice_id))
+            #question.choice_set.get(id= choice_id).delete()
+        return render(request, 'polls/create.html', context)
 
 
     else:

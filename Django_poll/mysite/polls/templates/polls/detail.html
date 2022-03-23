@@ -10,16 +10,27 @@
         <fieldset>
             <legend><h1>{{ question.question_text }}</h1></legend>
             {% if error_message %} <p><strong>{{ error_message }}</strong></p> {% endif %}
+
+            {% if question.answer_type == "Skala" %}
             {% for choice in question.choice_set.all %}
                 <input type ="radio" name="choice" id="choice{{ forloop.counter }}" value ="{{choice.id}}">
             <lable for="choice{{ forloop.counter }}">{{choice.choice_text}}</lable><br>
             {% endfor %}
+
+            {% elif question.answer_type == 'Pole Tekstowe' %}
+
+            <input type="text" id="fname" multiline name="fname" size="50" style="height:40px;font-size:14pt;">
+            <br>
+
+            {% endif %}
+
         </fieldset>
         <button type="sumbit" value="Vote">Głosuj!</button>
 
     </form>
     <form>
     <button formaction="{% url 'polls:create' question.id %}">Nowa Opcja</button>
+        {{ question.answer_type }}
         </form>
 </body>
 </html>
