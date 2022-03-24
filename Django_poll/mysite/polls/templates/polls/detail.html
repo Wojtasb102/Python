@@ -11,7 +11,7 @@
             <legend><h1>{{ question.question_text }}</h1></legend>
             {% if error_message %} <p><strong>{{ error_message }}</strong></p> {% endif %}
 
-            {% if question.answer_type == "Skala" %}
+            {% if question.answer_type == "Wielokrotnego wyboru" %}
             {% for choice in question.choice_set.all %}
                 <input type ="radio" name="choice" id="choice{{ forloop.counter }}" value ="{{choice.id}}">
             <lable for="choice{{ forloop.counter }}">{{choice.choice_text}}</lable><br>
