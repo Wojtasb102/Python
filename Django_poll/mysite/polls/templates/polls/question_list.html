@@ -1,4 +1,13 @@
-<!doctype html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+</html><!doctype html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -20,7 +29,7 @@
         {% if latest_question_list %}
             <ul>
             {% for question in latest_question_list %}
-                <li><a href="{% url 'polls:question_list' question  %}">{{ question }}</a></li>
+                <li><a href="{% url 'polls:detail' question.id %}">{{question}}</a></li>
             {% endfor %}
         </ul>
         {% else %}

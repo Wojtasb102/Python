@@ -12,34 +12,17 @@
             {% if error_message %} <p><strong>{{ error_message }}</strong></p> {% endif %}
 
             {% if question.answer_type == "Wielokrotnego wyboru" %}
-
             {% for choice in question.choice_set.all %}
-                 <input type="checkbox" value="{{choice.choice_text}}"
-
-                        {% if choice.choice_text in answer %}
-                        checked="checked"
-                        {% endif %}
-
-                        name="choice" id="multiple_choice">
-                 <lable value={{choice.choice_text}}>{{choice.choice_text}}</lable><br>
-            {% endfor %}
-
-            {% elif question.answer_type == "Pojedynczego wybory" %}
-            {% for choice in question.choice_set.all %}
-                <input type ="radio" name="choice" id="choice{{ forloop.counter }}"
-                       {% if choice.choice_text in answer %}
-                       checked="checked"
-                       {% endif %}
-                       value ="{{choice.choice_text}}">
+                <input type ="radio" name="choice" id="choice{{ forloop.counter }}" value ="{{choice.id}}">
             <lable for="choice{{ forloop.counter }}">{{choice.choice_text}}</lable><br>
             {% endfor %}
 
             {% elif question.answer_type == 'Pole Tekstowe' %}
 
-            <input type="text" id="choice" value="{{answer}}" multiline name="choice" size="50" style="height:40px;font-size:14pt;">
+            <input type="text" id="fname" multiline name="fname" size="50" style="height:40px;font-size:14pt;">
             <br>
-            {% endif %}
 
+            {% endif %}
 
         </fieldset>
         <button type="sumbit" value="Vote">Głosuj!</button>

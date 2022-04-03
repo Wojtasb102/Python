@@ -17,10 +17,10 @@
 
 <hr>
 
-        {% if latest_question_list %}
+        {% if category_list %}
             <ul>
-            {% for question in latest_question_list %}
-                <li><a href="{% url 'polls:question_list' question  %}">{{ question }}</a></li>
+            {% for category in category_list %}
+                <li><a href="{% url 'polls:answer_list' category username %}">{{ category }}</a></li>
             {% endfor %}
         </ul>
         {% else %}

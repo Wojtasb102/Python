@@ -3,30 +3,109 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 
 from django.urls import reverse
 from django.views import generic
 
-from .models import Question, Choice
+from .models import Question, Choice, Answer, Profile
 from django.utils import timezone
 
 
 # Create your views here.
 
-class IndexView(generic.ListView):
-    template_name = 'polls/index.html'
-    context_object_name = 'latest_question_list'
-
-    def get_queryset(self):
-        # zwróć 5 ostatnich pytań
-        return Question.objects.filter(
-            pub_date__lte=timezone.now()
-        ).order_by('-pub_date')[:5]
+def index(request):
+    if request.user.is_superuser:
+        return HttpResponseRedirect(reverse('polls:user_list'))
+    else:
+        return HttpResponseRedirect(reverse('polls:category_list', args={'username': request.user.username}))
 
 
-class DetailView(generic.DetailView):
-    model = Question
-    template_name = 'polls/detail.html'
+def user_list(request):
+    user_list = []
+    for user in User.objects.all():
+        if not user.is_superuser:
+            user_list.append(user)
+    context = {
+        'users': user_list
+    }
+
+    return render(request, 'polls/user_list.html', context)
+
+
+def category_list(request, username):
+    if request.user.is_superuser:
+        category_list = User.objects.get(username=username).profile.my_field
+        context = {
+            'category_list': category_list,
+            'username': username,
+        }
+        return render(request, 'polls/category_list_admin.html', context)
+        # return HttpResponseRedirect(reverse('polls:detail', args=(question.id + 1,)))
+        # user_list=[]
+        # print(User.objects.all())
+        # for user in User.objects.all():
+        #     print(user)
+        #     if not user.is_superuser:
+        #         user_list.append(user)
+        # context = {
+        #     'latest_question_list': user_list
+        # }
+    else:
+        latest_question_list = User.objects.get(username=request.user.username).profile.my_field
+        context = {
+            'latest_question_list': latest_question_list,
+        }
+        return render(request, 'polls/category_list.html', context)
+
+
+def answer_list(request, category, username):
+    answer = []
+    questions = Question.objects.filter(question_type=category)
+    for q in questions:
+        answer.append(q.question.filter(user=username).first())
+
+    context = {
+        'answers': answer
+    }
+
+    return render(request, 'polls/answer_list.html', context)
+
+    # return User.objects.get(username="Wojciech").profile.my_field
+
+    # # zwróć 5 ostatnich pytań
+    # return Question.objects.filter(
+    #     pub_date__lte=timezone.now()
+    # ).order_by('-pub_date')[:5]
+
+
+def QuestionList(request, question_type):
+    latest_question_list = Question.objects.filter(question_type=question_type)
+    print(latest_question_list)
+    question = Question.objects.filter(question_type=question_type)
+    print("{} user name is".format(request.user.is_authenticated))
+    context = {
+        'latest_question_list': latest_question_list,
+        'question': question
+    }
+    print(context)
+    return render(request, 'polls/question_list.html', context)
+
+
+def detail(request, question_id):
+    # try:
+    #     question = Question.objects.get(pk=question_id)
+    # except Question.DoesNotExist:
+    #     raise Http404("Question does not exist")
+    # return render(request, 'polls/detail.html', {'question':question})
+    q = get_object_or_404(Question, pk=question_id)
+    answer = " "
+
+    if q.question.filter(user=request.user.username).exists():
+        answer = q.question.filter(user=request.user.username).first().answer
+        print(q.question.filter(user=request.user.username).first().answer)
+
+    return render(request, 'polls/detail.html', {'question': q, 'answer': answer})
 
 
 class ResultsView(generic.DetailView):
@@ -34,20 +113,32 @@ class ResultsView(generic.DetailView):
     template_name = 'polls/result.html'
 
 
+@login_required
 def vote(request, question_id):
-    question = get_object_or_404(Question, pk=question_id)
-    try:
-        selected_choice = question.choice_set.get(pk=request.POST['choice'])
-    except (KeyError, Choice.DoesNotExist):
-        return render(request, 'polls/detail.html', {
-            'question': question,
-            'error_message': "You dident select"
-        })
+    q = get_object_or_404(Question, pk=question_id)
+    # try:
+    #     selected_choice = question.choice_set.get(pk=request.POST['choice'])
+    # except (KeyError, Choice.DoesNotExist):
+    #     return render(request, 'polls/detail.html', {
+    #         'question': question,
+    #         'error_message': "You dident select"
+    #     })
+    # else:
+    username = request.user.username
+    if q.answer_type == 'Wielokrotnego wyboru':
+        answer = request.POST.getlist('choice')
     else:
-        selected_choice.votes += 1
-        selected_choice.save()
+        answer = request.POST.get('choice')
+    a = q.question.filter(user=username)
+    print(answer)
+    if not a:
+        print("lista pusta")
+        q.question.create(user=username, answer=answer)
+    else:
+        print("lista pelna")
+        a.update(answer=answer)
 
-        return HttpResponseRedirect(reverse('polls:detail', args=(question.id+1,)))
+    return HttpResponseRedirect(reverse('polls:detail', args=(q.id,)))
 
 
 def create(request, question_id):
@@ -68,8 +159,8 @@ def create(request, question_id):
             for ids in choice_id:
                 question.choice_set.get(id=ids).delete()
             print(choice_id)
-            #print(question.choice_set.get(id= choice_id))
-            #question.choice_set.get(id= choice_id).delete()
+            # print(question.choice_set.get(id= choice_id))
+            # question.choice_set.get(id= choice_id).delete()
         return render(request, 'polls/create.html', context)
 
 
@@ -94,15 +185,7 @@ def add(request, question_id):
 #     return render(request, 'polls/index.html', context)
 #
 #
-# def detail(request, question_id):
-#     # try:
-#     #     question = Question.objects.get(pk=question_id)
-#     # except Question.DoesNotExist:
-#     #     raise Http404("Question does not exist")
-#     # return render(request, 'polls/detail.html', {'question':question})
-#     question = get_object_or_404(Question, pk=question_id)
-#     print(question)
-#     return render(request, 'polls/detail.html', {'question': question})
+
 #
 #
 # def results(request, question_id):

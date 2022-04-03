@@ -17,11 +17,23 @@
 
 <hr>
 
-        {% if latest_question_list %}
+        {% if answers %}
             <ul>
-            {% for question in latest_question_list %}
-                <li><a href="{% url 'polls:question_list' question  %}">{{ question }}</a></li>
+                <table>
+                    <tr>
+                        <th>Pytanie</th>
+                        <th>Odpowiedzi</th>
+                    </tr>
+            {% for answer in answers %}
+
+               <tr>
+                    <td>{{answer.question}}</td>
+                    <td>{{answer.answer}}</td>
+               </tr>
+
+
             {% endfor %}
+                </table>
         </ul>
         {% else %}
             <p>No polls are available.</p>

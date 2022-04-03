@@ -47,16 +47,16 @@ class Choice(models.Model):
     votes = models.IntegerField(default=0)
 
     def __str__(self):
-        return ("{}: {} ".format(self.question, self.choice_text))
+        return ("Odpowiedź: {} ".format(self.choice_text))
 
 
 class Answer(models.Model):
     user = models.CharField(max_length=30)
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name="question")
-    answer = models.CharField(max_length=200, null=True)
+    answer = models.CharField(max_length=200)
 
     def __str__(self):
-        return("{}: {} {}".format(self.user, self.question,self.answer))
+        return("{} {}".format(self.question,self.answer))
 
 
 class Profile(models.Model):
