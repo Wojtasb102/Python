@@ -80,7 +80,7 @@ def answer_list(request, category, username):
 
 
 def QuestionList(request, question_type):
-    latest_question_list = Question.objects.filter(question_type=question_type)
+    latest_question_list = Question.objects.filter(question_type=question_type).order_by('question_number')
     question = Question.objects.filter(question_type=question_type)
     answer = []
     for q in question:
