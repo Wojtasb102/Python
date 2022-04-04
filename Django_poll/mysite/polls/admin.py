@@ -12,8 +12,8 @@ admin.site.register(Profile)
 
 
 class QuestionAdmin(admin.ModelAdmin):
-    list_filter = ('question_type', 'question_number')
-    list_display = ('question_number', 'question_text')
+    list_filter = ('question_type', 'question_number', 'answer_type')
+    list_display = ('question_number', 'question_text', 'answer_type', 'choice_text')
 
     def get_ordering(self, request):
         return [Lower('question_number')]  # sort case insensitive

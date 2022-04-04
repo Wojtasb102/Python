@@ -61,7 +61,7 @@ def category_list(request, username):
 
 def answer_list(request, category, username):
     answer = []
-    questions = Question.objects.filter(question_type=category)
+    questions = Question.objects.filter(question_type=category).order_by('question_number')
     for q in questions:
         answer.append(q.question.filter(user=username).first())
 

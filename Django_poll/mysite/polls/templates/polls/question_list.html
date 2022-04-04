@@ -38,10 +38,10 @@
 
             {% if question.answer_type == "Wielokrotnego wyboru" %}
 
-            {% for choice in question.choice_set.first.choice_split %}
-                 <input type="checkbox" value="{{choice.choice_text}}"
+            {% for choice in question.choice_split %}
+                 <input type="checkbox" value="{{choice}}"
 
-                        {% if choice.choice_text in answer|index:forloop.parentloop.counter0 %}
+                        {% if choice in answer|index:forloop.parentloop.counter0 %}
                         checked="checked"
                         {% endif %}
 
@@ -50,12 +50,12 @@
             {% endfor %}
 
             {% elif question.answer_type == "Pojedynczego wybory" %}
-            {% for choice in question.choice_set.first.choice_split %}
+            {% for choice in question.choice_split %}
                 <input type ="radio" name="choice" id="choice{{ forloop.counter }}"
-                       {% if choice.choice_text in answer|index:forloop.parentloop.counter0 %}
+                       {% if choice in answer|index:forloop.parentloop.counter0 %}
                        checked="checked"
                        {% endif %}
-                       value ="{{choice.choice_text}}">
+                       value ="{{choice}}">
             <lable for="choice{{ forloop.counter }}">{{choice}}</lable><br>
             {% endfor %}
 

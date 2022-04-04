@@ -34,6 +34,7 @@ class Question(models.Model):
     answer_type = models.CharField(max_length=30, choices=ANSWER_TYPES, default="Pole Tekstowe")
     question_type = models.CharField(max_length=30, choices=QUESTION_CATEGORY, default="ogolne")
     question_number = models.SmallIntegerField(default=0, blank=False)
+    choice_text = models.CharField(max_length=200, default=" ", blank = True)
 
     def __str__(self):
         return ("{}: {}".format(self.question_number, self.question_text))
@@ -42,6 +43,8 @@ class Question(models.Model):
         now = timezone.now()
         return now - datetime.timedelta(days=1) <= self.pub_date <= now
 
+    def choice_split(self):
+        return self.choice_text.split(',')
 
 class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
