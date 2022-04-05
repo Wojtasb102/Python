@@ -27,41 +27,44 @@
 
 <hr>
 
-        {% if latest_question_list %}
-            <ul>
-            {% for question in latest_question_list %}
-                <form action="{% url 'polls:vote' question.id %}" method ="post">
+{% if latest_question_list %}
+<ul>
+    {% for question in latest_question_list %}
+    <form action="{% url 'polls:vote' question.id %}" method="post">
         {% csrf_token %}
         <fieldset>
-            <legend><h1>{{ question.question_number }}. {{ question.question_text }}</h1></legend>
+            <legend><h1>{{ question.question_number }}." {{ question.id}}" {{ question.question_text }}</h1></legend>
             {% if error_message %} <p><strong>{{ error_message }}</strong></p> {% endif %}
 
             {% if question.answer_type == "Wielokrotnego wyboru" %}
 
             {% for choice in question.choice_split %}
-                 <input type="checkbox" value="{{choice}}"
+            <input type="checkbox" value="{{choice}}"
 
-                        {% if choice in answer|index:forloop.parentloop.counter0 %}
-                        checked="checked"
-                        {% endif %}
+                   {% if choice in answer|index:forloop.parentloop.counter0 %}
+                   checked="checked"
+                   {% endif %}
 
-                        name="choice" id="multiple_choice">
-                 <lable value={{choice.choice_text}}>{{choice}}</lable><br>
+                   name="choice" id="multiple_choice">
+            <lable value={{choice.choice_text}}>{{choice}}</lable>
+            <br>
             {% endfor %}
 
             {% elif question.answer_type == "Pojedynczego wybory" %}
             {% for choice in question.choice_split %}
-                <input type ="radio" name="choice" id="choice{{ forloop.counter }}"
-                       {% if choice in answer|index:forloop.parentloop.counter0 %}
-                       checked="checked"
-                       {% endif %}
-                       value ="{{choice}}">
-            <lable for="choice{{ forloop.counter }}">{{choice}}</lable><br>
+            <input type="radio" name="choice" id="choice{{ forloop.counter }}"
+                   {% if choice in answer|index:forloop.parentloop.counter0 %}
+                   checked="checked"
+                   {% endif %}
+                   value="{{choice}}">
+            <lable for="choice{{ forloop.counter }}">{{choice}}</lable>
+            <br>
             {% endfor %}
 
             {% elif question.answer_type == 'Pole Tekstowe' %}
 
-            <input type="text" id="choice" value="{{answer|index:forloop.counter0}}" multiline name="choice" size="50" style="height:40px;font-size:14pt;">
+            <input type="text" id="choice" value="{{answer|index:forloop.counter0}}" multiline name="choice" size="50"
+                   style="height:40px;font-size:14pt;">
             <br>
             {% endif %}
 
@@ -70,10 +73,10 @@
         <button type="sumbit" value="Vote">Głosuj!</button>
 
     </form>
-            {% endfor %}
-        </ul>
-        {% else %}
-            <p>No polls are available.</p>
-        {% endif %}
+    {% endfor %}
+</ul>
+{% else %}
+<p>No polls are available.</p>
+{% endif %}
 </body>
 </html>

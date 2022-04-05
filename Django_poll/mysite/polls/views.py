@@ -81,7 +81,7 @@ def answer_list(request, category, username):
 
 def QuestionList(request, question_type):
     latest_question_list = Question.objects.filter(question_type=question_type).order_by('question_number')
-    question = Question.objects.filter(question_type=question_type)
+    question = Question.objects.filter(question_type=question_type).order_by('question_number')
     answer = []
     for q in question:
         if q.question.filter(user=request.user.username).exists():
@@ -130,13 +130,13 @@ def vote(request, question_id):
     # else:
     username = request.user.username
     question_type = q.question_type
-    print(q.answer_type)
+    print(question_id)
     if q.answer_type == 'Wielokrotnego wyboru':
         answer = request.POST.getlist('choice')
     else:
         answer = request.POST.get('choice')
     a = q.question.filter(user=username)
-    print(answer)
+    print(a)
     if not a:
         print("lista pusta")
         q.question.create(user=username, answer=answer)
@@ -144,7 +144,7 @@ def vote(request, question_id):
         print("lista pelna")
         a.update(answer=answer)
 
-    return HttpResponseRedirect(reverse('polls:question_list', kwargs={"question_type":question_type}))
+    return HttpResponseRedirect(reverse('polls:question_list', kwargs={"question_type": question_type}))
 
 
 def create(request, question_id):

@@ -65,6 +65,10 @@ class Answer(models.Model):
     def __str__(self):
         return ("{}: {} {}".format(self.user, self.question, self.answer))
 
+    def updates(self, answer):
+        print("funkcja")
+        self.answer = answer
+
 
 class Profile(models.Model):
     user = models.OneToOneField(User, null=True, on_delete=models.CASCADE)
