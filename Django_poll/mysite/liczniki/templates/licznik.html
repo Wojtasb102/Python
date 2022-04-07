@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<form action="{% url 'liczniki:confirm' licznik_id %}" method="post">
+    {% csrf_token %}
+    <p name="licznik" value="{{licznik_id}}">Licznik nr {{licznik_id}}:
+        <input name="odczyt" value=" ">
+
+        <button type="submit">Potwierdź</button>
+</form>
+
+</body>
+</html>

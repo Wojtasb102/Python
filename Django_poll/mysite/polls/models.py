@@ -14,9 +14,9 @@ QUESTION_CATEGORY = (('kuchnia', 'Kuchnia'),
                      ('ogolne', 'Ogolne'))
 
 ANSWER_TYPES = [
-    ('Pole Tekstowe', 'Text Field'),
-    ('Pojedynczego wybory', 'Singlechoice'),
-    ('Wielokrotnego wyboru', 'Multiplechoice'),
+    ('text', 'Pole Tekstowe'),
+    ('radio', 'Pojedynczego wyboru'),
+    ('checkbox', 'Wielokrotnego wyboru'),
     ('Skala', 'Scale')
 ]
 
@@ -25,16 +25,11 @@ ANSWER_TYPES = [
 class Question(models.Model):
     question_text = models.CharField(max_length=200)
     pub_date = models.DateTimeField('date published')
-    ANSWER_TYPES = [
-        ('Pole Tekstowe', 'Text Field'),
-        ('Pojedynczego wybory', 'Singlechoice'),
-        ('Wielokrotnego wyboru', 'Multiplechoice'),
-        ('Skala', 'Scale')
-    ]
+
     answer_type = models.CharField(max_length=30, choices=ANSWER_TYPES, default="Pole Tekstowe")
     question_type = models.CharField(max_length=30, choices=QUESTION_CATEGORY, default="ogolne")
     question_number = models.SmallIntegerField(default=0, blank=False)
-    choice_text = models.CharField(max_length=200, default=" ", blank = True)
+    choice_text = models.CharField(max_length=200, default=" ", blank=True)
 
     def __str__(self):
         return ("{}: {}".format(self.question_number, self.question_text))
@@ -46,6 +41,17 @@ class Question(models.Model):
     def choice_split(self):
         return self.choice_text.split(',')
 
+    def type(self):
+        print(self.answer_type)
+        return self.answer_type
+
+    def isTextField(self):
+        if self.answer_type == 'text':
+            return True
+        else:
+            return False
+
+
 class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     choice_text = models.CharField(max_length=200)
@@ -56,6 +62,7 @@ class Choice(models.Model):
 
     def choice_split(self):
         return self.choice_text.split(',')
+
 
 class Answer(models.Model):
     user = models.CharField(max_length=30)
